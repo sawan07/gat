@@ -15,10 +15,12 @@
     --line: #e6e2ef; --accent: #7243f2; --accent-ink: #ffffff;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink);
+  body { margin: 0; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column;
+         background: var(--bg); color: var(--ink);
          font: 16px/1.6 "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   header { background: var(--card); border-bottom: 1px solid var(--line); }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; width: 100%; }
+  main.wrap { flex: 1 0 auto; }
   .bar { display: flex; align-items: center; justify-content: space-between; height: 64px; }
   .brand img { height: 36px; width: auto; display: block; }
   h1, .meta h2 { font-family: "Syne", "DM Sans", sans-serif; }
