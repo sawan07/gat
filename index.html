@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Global Alliance Trust – Homepage Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f4f5fa; --card: #ffffff; --ink: #1d1729; --muted: #6c6a72;
+    --line: #e6e2ef; --accent: #7243f2; --accent-ink: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.6 "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { background: var(--card); border-bottom: 1px solid var(--line); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand img { height: 36px; width: auto; display: block; }
+  h1, .meta h2 { font-family: "Syne", "DM Sans", sans-serif; }
+  footer { background: var(--ink); color: #cfcadb; font-size: 14px; }
+  footer .wrap { padding-top: 24px; padding-bottom: 24px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+  footer a { color: #fff; text-decoration: none; }
+  .tag { color: var(--muted); font-size: 14px; }
+  .intro { padding: 40px 0 8px; }
+  h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.2; margin: 0 0 8px; }
+  .intro p { color: var(--muted); max-width: 720px; margin: 0; }
+  .grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          padding: 32px 0 48px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+          overflow: hidden; display: flex; flex-direction: column; }
+  .shot { display: block; height: 420px; overflow: hidden; border-bottom: 1px solid var(--line);
+          cursor: zoom-in; background: #fff; padding: 0; border-width: 0 0 1px; width: 100%; }
+  .shot img { width: 100%; display: block; }
+  .meta { padding: 16px 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .meta h2 { font-size: 18px; margin: 0; }
+  .btn { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px;
+         padding: 9px 14px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .note { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding: 20px 0 40px; }
+  /* full-size viewer */
+  .viewer { position: fixed; inset: 0; background: #0b111c; display: none; z-index: 10; }
+  .viewer.open { display: block; }
+  .viewer .scroll { position: absolute; inset: 56px 0 0; overflow: auto; text-align: center; padding: 0 16px 32px; }
+  .viewer img { max-width: 1000px; width: 100%; }
+  .vbar { position: absolute; top: 0; left: 0; right: 0; height: 56px; display: flex; align-items: center;
+          justify-content: space-between; padding: 0 16px; color: #fff; background: #0b111c; }
+  .vbar button { background: rgba(255,255,255,.12); color: #fff; border: 0; border-radius: 8px;
+                 padding: 8px 12px; font: inherit; font-size: 14px; cursor: pointer; margin-left: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="https://onlinesoft.co.uk" aria-label="Online Soft Limited"><img src="images/onlinesoft-logo.png" alt="Online Soft" width="140" height="42"></a>
+    <div class="tag">Design preview</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <h1>Global Alliance Trust – homepage concepts</h1>
+    <p>Three directions for the new homepage. Click any design to view it full size, then let us know which one you prefer and anything you would like changed.</p>
+  </section>
+
+  <section class="grid" id="grid"></section>
+
+  <p class="note">These are visual concepts only. Text, photos, figures and advertiser logos are placeholders and will be replaced with content supplied by Global Alliance Trust before the site is built.</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Prepared by Online Soft Limited</span>
+    <span><a href="mailto:hello@onlinesoft.co.uk">hello@onlinesoft.co.uk</a> &nbsp;·&nbsp; <a href="tel:+442037599027">020 3759 9027</a></span>
+  </div>
+</footer>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Full-size design">
+  <div class="vbar">
+    <strong id="vtitle"></strong>
+    <div>
+      <button id="prev" aria-label="Previous concept">‹ Prev</button>
+      <button id="next" aria-label="Next concept">Next ›</button>
+      <button id="close" aria-label="Close">Close ✕</button>
+    </div>
+  </div>
+  <div class="scroll" id="vscroll"><img id="vimg" alt=""></div>
+</div>
+
+<script>
+  const concepts = [
+    { title: "Concept A", src: "images/concept-a.jpg" },
+    { title: "Concept B", src: "images/concept-b.jpg" },
+    { title: "Concept C", src: "images/concept-c.jpg" },
+  ];
+  const grid = document.getElementById("grid");
+  concepts.forEach((c, i) => {
+    grid.insertAdjacentHTML("beforeend", `
+      <article class="card">
+        <button class="shot" data-i="${i}" aria-label="View ${c.title} full size">
+          <img src="${c.src}" alt="${c.title} homepage design" loading="lazy">
+        </button>
+        <div class="meta"><h2>${c.title}</h2><button class="btn" data-i="${i}">View full size</button></div>
+      </article>`);
+  });
+
+  const viewer = document.getElementById("viewer"), vimg = document.getElementById("vimg"),
+        vtitle = document.getElementById("vtitle"), vscroll = document.getElementById("vscroll");
+  let current = 0;
+  function show(i) {
+    current = (i + concepts.length) % concepts.length;
+    vimg.src = concepts[current].src; vimg.alt = concepts[current].title + " full size";
+    vtitle.textContent = concepts[current].title;
+    vscroll.scrollTop = 0; viewer.classList.add("open"); document.body.style.overflow = "hidden";
+  }
+  function hide() { viewer.classList.remove("open"); document.body.style.overflow = ""; }
+  grid.addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) show(+b.dataset.i); });
+  document.getElementById("prev").onclick = () => show(current - 1);
+  document.getElementById("next").onclick = () => show(current + 1);
+  document.getElementById("close").onclick = hide;
+  document.addEventListener("keydown", e => {
+    if (!viewer.classList.contains("open")) return;
+    if (e.key === "Escape") hide();
+    if (e.key === "ArrowLeft") show(current - 1);
+    if (e.key === "ArrowRight") show(current + 1);
+  });
+</script>
+</body>
+</html>
