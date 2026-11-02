@@ -6,6 +6,7 @@ can call, each returning a plain dict.
 import os
 import re
 
+from payments import create_payment_link
 from data import (
     ORG, CAMPAIGNS, CAMPAIGNS_BY_ID, DONATIONS, GIFT_AID_RATE,
     next_donation_id,
@@ -114,8 +115,20 @@ def create_donation(
         "dedication_name": dedication_name,
         "message": message,
         "status": "PLEDGED",
-        "payment": "pending: a secure payment link will be sent to complete this donation",
     }
+    payment_link = create_payment_link(donation)
+    donation["payment_link"] = payment_link
+    if payment_link:
+        donation["payment"] = (
+            "Share payment_link with the donor exactly as given; the chat also shows a Pay button. "
+            + ("It sets up the monthly gift." if frequency == "monthly" else "It is for this one-off gift.")
+            + " The link works once."
+        )
+    else:
+        donation["payment"] = (
+            "No payment link is available right now. Tell the donor the team will be in "
+            "touch by email to complete the donation. Do not invent a link."
+        )
     DONATIONS.append(donation)
     return {"success": True, "donation_id": donation["id"], **donation}
 
@@ -133,8 +146,8 @@ TOOL_SCHEMAS = [
     {
         "name": "create_donation",
         "description": (
-            "Record a donation pledge. No payment is taken through this tool; "
-            "the donor completes payment via a secure link sent afterwards. Only call "
+            "Record a donation and create its secure Stripe payment link (payment_link "
+            "in the result). Only call "
             "this once the donor has confirmed the amount, frequency, cause, Gift Aid "
             "choice, and any dedication."
         ),

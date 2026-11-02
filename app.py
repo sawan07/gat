@@ -20,12 +20,13 @@ import logging
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from openai import OpenAI
 
 from tools import TOOL_SCHEMAS, TOOL_FUNCTIONS, gift_aid_enabled
+from payments import stripe_enabled
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("gat")
@@ -143,9 +144,19 @@ class ChatRequest(BaseModel):
     message: str
 
 
+class Payment(BaseModel):
+    url: str
+    amount: float
+    frequency: str
+    campaign_name: str
+
+
 class ChatResponse(BaseModel):
     thread_id: str
     reply: str
+    # Set when this turn created a donation with a Stripe link, so the page
+    # can show a Pay button that doesn't depend on the model copying the URL.
+    payment: Payment | None = None
 
 
 app = FastAPI(title="Global Alliance Trust Assistant", docs_url=None, redoc_url=None)
@@ -153,7 +164,7 @@ app = FastAPI(title="Global Alliance Trust Assistant", docs_url=None, redoc_url=
 
 @app.get("/healthz")
 def healthz():
-    return {"ok": True, "agent": "gat"}
+    return {"ok": True, "agent": "gat", "payments": stripe_enabled()}
 
 
 @app.post("/api/new-thread")
@@ -194,6 +205,7 @@ def chat(req: ChatRequest, request: Request):
     messages.append({"role": "user", "content": message})
 
     hops = 0
+    payment = None
     while True:
         try:
             response = client.chat.completions.create(
@@ -234,6 +246,9 @@ def chat(req: ChatRequest, request: Request):
             result = run_tool(call.function.name, args)
             log.info("tool_call thread=%s name=%s success=%s",
                      req.thread_id, call.function.name, result.get("success", "n/a"))
+            if call.function.name == "create_donation" and result.get("success") and result.get("payment_link"):
+                payment = Payment(url=result["payment_link"], amount=result["amount"],
+                                  frequency=result["frequency"], campaign_name=result["campaign_name"])
             messages.append({
                 "role": "tool",
                 "tool_call_id": call.id,
@@ -248,7 +263,14 @@ def chat(req: ChatRequest, request: Request):
             tail.pop(0)
         messages[:] = [messages[0]] + tail
 
-    return ChatResponse(thread_id=req.thread_id, reply=reply)
+    return ChatResponse(thread_id=req.thread_id, reply=reply, payment=payment)
+
+
+@app.get("/thank-you", include_in_schema=False)
+def thank_you():
+    # Stripe redirects here after payment. Payment status itself is in the
+    # Stripe dashboard (this app keeps no donation records between restarts).
+    return FileResponse(os.path.join(_here, "static", "thank-you.html"))
 
 
 @app.get("/concepts", include_in_schema=False)
