@@ -21,6 +21,7 @@ app.py               FastAPI server: chat API, rate limiting, static pages
 data.py              GAT profile + causes (descriptions are placeholders)
 tools.py             get_campaigns / create_donation + their schemas
 payments.py          Stripe Payment Links for one-off and monthly donations
+mailer.py            Donation confirmation email (Brevo API or SMTP) with the payment link
 system_prompt.md     Assistant instructions and guardrails
 static/index.html    Donation assistant page (GAT header/footer design)
 static/thank-you.html  Post-payment page
@@ -38,6 +39,10 @@ When the donor confirms, `create_donation` calls Stripe (`payments.py`):
 2. creates a **Payment Link** for it, usable once, with the donation details
    (id, cause, Gift Aid, donor name/email) as metadata on the link and on the
    resulting payment or subscription, redirecting to `/thank-you` afterwards.
+
+The donor also gets a confirmation email with the details and the same link
+(`mailer.py`, Brevo; max 3 emails per address per hour). With no email settings, nothing is
+sent and the assistant doesn't promise an email.
 
 The chat shows the link in the assistant's reply **and** as a Pay button
 (sent separately by the API, so it works even if the model mangles the URL).
@@ -69,6 +74,10 @@ Tests: `pip install pytest && pytest -q`
 | `OPENAI_API_KEY` | (required) | OpenAI key |
 | `STRIPE_SECRET_KEY` | (unset) | GAT's Stripe secret key. Unset = no payment links |
 | `GAT_PUBLIC_URL` | `https://gat.amverio.co.uk` | Base URL Stripe redirects back to |
+| `BREVO_API_KEY` | (unset) | Brevo API key (`xkeysib-...`) for confirmation emails |
+| `BREVO_SENDER_EMAIL` | (unset) | From address; must be a sender/domain verified in Brevo |
+| `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_HOST` / `SMTP_PORT` | (unset) / `smtp-relay.brevo.com` / `587` | Brevo SMTP, used if the API key isn't set or fails |
+| `GAT_EMAIL_FROM_NAME` | `Global Alliance Trust` | From name on emails |
 | `GAT_MODEL` | `gpt-4.1` | Model used for the assistant |
 | `GAT_GIFT_AID` | `1` | Set `0` if GAT isn't registered with HMRC for Gift Aid; the assistant then stops offering it |
 | `GAT_RATE_PER_10MIN` | `30` | Messages allowed per visitor IP per 10 minutes |

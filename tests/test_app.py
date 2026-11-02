@@ -15,13 +15,48 @@ import pytest
 from fastapi.testclient import TestClient
 
 import app as gat_app
+import mailer
 import payments
 import tools
 
 
 @pytest.fixture(autouse=True)
 def no_stripe(monkeypatch):
-    monkeypatch.delenv("STRIPE_SECRET_KEY", raising=False)
+    for k in ("STRIPE_SECRET_KEY", "BREVO_API_KEY", "BREVO_SENDER_EMAIL", "SMTP_USER", "SMTP_PASSWORD"):
+        monkeypatch.delenv(k, raising=False)
+    mailer._sent.clear()
+
+
+def test_email_not_configured_is_not_promised():
+    out = tools.create_donation(amount=10, campaign_id="GENERAL", donor_name="A", donor_email="a@example.com")
+    assert out["email_sent"] is False and "Do not tell the donor" in out["email_note"]
+
+
+def test_email_sent_via_brevo_api(monkeypatch, stripe_calls):
+    monkeypatch.setenv("BREVO_API_KEY", "xkeysib-fake")
+    monkeypatch.setenv("BREVO_SENDER_EMAIL", "donations@amverio.co.uk")
+    sent = []
+
+    class Resp:
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+
+    def fake_urlopen(req, timeout=None):
+        sent.append(json.loads(req.data))
+        return Resp()
+
+    monkeypatch.setattr(mailer.urllib.request, "urlopen", fake_urlopen)
+    out = tools.create_donation(amount=50, campaign_id="EDUCATION", donor_name="Hasan",
+                                donor_email="h@example.com", gift_aid=True)
+    assert out["email_sent"] is True
+    msg = sent[0]
+    assert msg["to"][0]["email"] == "h@example.com"
+    assert msg["sender"] == {"name": "Global Alliance Trust", "email": "donations@amverio.co.uk"}
+    assert "https://buy.stripe.com/test_abc" in msg["htmlContent"] and "+£12.50" in msg["textContent"]
+    # throttled after 3 per hour
+    for _ in range(3):
+        tools.create_donation(amount=5, campaign_id="GENERAL", donor_name="H", donor_email="h@example.com")
+    assert len(sent) == 3
 
 
 @pytest.fixture

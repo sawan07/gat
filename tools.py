@@ -7,6 +7,7 @@ import os
 import re
 
 from payments import create_payment_link
+from mailer import send_donation_email
 from data import (
     ORG, CAMPAIGNS, CAMPAIGNS_BY_ID, DONATIONS, GIFT_AID_RATE,
     next_donation_id,
@@ -118,17 +119,24 @@ def create_donation(
     }
     payment_link = create_payment_link(donation)
     donation["payment_link"] = payment_link
+    donation["email_sent"] = send_donation_email(donation, payment_link)
     if payment_link:
         donation["payment"] = (
-            "Share payment_link with the donor exactly as given; the chat also shows a Pay button. "
+            "Paste payment_link into your reply exactly as given (full URL, unchanged); the chat "
+            "also shows a Pay button. "
             + ("It sets up the monthly gift." if frequency == "monthly" else "It is for this one-off gift.")
             + " The link works once."
         )
     else:
         donation["payment"] = (
             "No payment link is available right now. Tell the donor the team will be in "
-            "touch by email to complete the donation. Do not invent a link."
+            "touch to complete the donation. Do not invent a link."
         )
+    donation["email_note"] = (
+        f"A confirmation email{' with the payment link' if payment_link else ''} was sent to {donation['donor_email']}."
+        if donation["email_sent"] else
+        "No email was sent. Do not tell the donor they will receive an email."
+    )
     DONATIONS.append(donation)
     return {"success": True, "donation_id": donation["id"], **donation}
 
