@@ -1,0 +1,10 @@
+.git/
+.gitignore
+.env
+.secrets*
+*.secret*
+__pycache__/
+*.pyc
+.pytest_cache/
+tests/
+WhatsApp Image*
