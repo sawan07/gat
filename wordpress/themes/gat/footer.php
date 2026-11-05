@@ -73,6 +73,11 @@ $gat_has_contact = $gat_contact['address'] || $gat_contact['phone'] || $gat_cont
 		);
 		?>
 	</div>
+
+	<div class="wrap site-footer__credit">
+		<span><?php esc_html_e( 'Powered by Amverio', 'gat' ); ?></span>
+		<a href="https://amverio.co.uk" target="_blank" rel="noopener">amverio.co.uk</a>
+	</div>
 </footer>
 
 <?php wp_footer(); ?>
