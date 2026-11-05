@@ -1,0 +1,15 @@
+/*
+Theme Name: Global Alliance Trust
+Theme URI: https://amverio.co.uk
+Author: Amverio
+Author URI: https://amverio.co.uk
+Description: Custom theme for Global Alliance Trust (GAT). Homepage sections are edited in Appearance → Customize → Homepage; all other pages use the block editor. Works with the GAT Core plugin (advertisers, enquiry forms, roles).
+Version: 1.0.0
+Requires at least: 6.5
+Tested up to: 7.1
+Requires PHP: 8.1
+License: Proprietary
+Text Domain: gat
+*/
+
+/* Styles live in assets/css/theme.css */
