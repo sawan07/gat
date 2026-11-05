@@ -161,3 +161,31 @@ function gat_editor_fonts() {
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'gat_editor_fonts' );
+
+/**
+ * Browser-tab icon from the theme, until a Site Icon is set in
+ * Appearance → Customize → Site Identity.
+ */
+function gat_fallback_favicon() {
+	if ( has_site_icon() ) {
+		return;
+	}
+	printf( '<link rel="icon" type="image/png" sizes="192x192" href="%s">' . "\n", esc_url( get_theme_file_uri( 'assets/img/gat-favicon.png' ) ) );
+	printf( '<link rel="apple-touch-icon" href="%s">' . "\n", esc_url( get_theme_file_uri( 'assets/img/gat-apple-touch.png' ) ) );
+}
+add_action( 'wp_head', 'gat_fallback_favicon', 5 );
+add_action( 'admin_head', 'gat_fallback_favicon', 5 );
+add_action( 'login_head', 'gat_fallback_favicon', 5 );
+
+/**
+ * GAT logo on the WordPress login screen.
+ */
+function gat_login_logo() {
+	printf(
+		'<style>#login h1 a{background-image:url(%s);background-size:contain;width:120px;height:120px}</style>',
+		esc_url( get_theme_file_uri( 'assets/img/gat-logo.png' ) )
+	);
+}
+add_action( 'login_enqueue_scripts', 'gat_login_logo' );
+add_filter( 'login_headerurl', fn() => home_url( '/' ) );
+add_filter( 'login_headertext', fn() => get_bloginfo( 'name' ) );
