@@ -230,7 +230,7 @@ h1, h2, h3, h4 { color: var(--navy); line-height: 1.2; }
 .ticker.is-paused .ticker__track, .ticker:focus-within .ticker__track { animation-play-state: paused; }
 .ticker__controls { flex: none; display: flex; gap: 8px; }
 @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce) { .ticker__track { animation: none; } .ticker__viewport { overflow-x: auto; } }
+@media (prefers-reduced-motion: reduce) { .ticker__track { animation: none; } .ticker__viewport { overflow-x: auto; scrollbar-width: none; } .ticker__viewport::-webkit-scrollbar { display: none; } }
 @media (max-width: 600px) { .ticker__label span { display: none; } .ticker__controls .round-btn:first-child { display: none; } }
 
 /* Sections -------------------------------------------------------------- */

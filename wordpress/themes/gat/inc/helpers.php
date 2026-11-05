@@ -114,7 +114,18 @@ function gat_home_image( $key, $fallback, $size = 'large' ) {
 			return $src;
 		}
 	}
-	return get_theme_file_uri( 'assets/img/' . $fallback );
+	return gat_asset( 'assets/img/' . $fallback );
+}
+
+/**
+ * URL of a file in the theme, stamped with the theme version so Cloudflare
+ * and browsers fetch the new file after every theme update.
+ *
+ * @param string $path Path inside the theme.
+ * @return string
+ */
+function gat_asset( $path ) {
+	return add_query_arg( 'ver', GAT_THEME_VERSION, get_theme_file_uri( $path ) );
 }
 
 /**
@@ -161,7 +172,7 @@ function gat_logo_url() {
 			return $src;
 		}
 	}
-	return get_theme_file_uri( 'assets/img/gat-logo.png' );
+	return gat_asset( 'assets/img/gat-logo.png' );
 }
 
 /**
