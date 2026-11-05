@@ -193,12 +193,12 @@ add_shortcode(
 		if ( ! $ads ) {
 			return '<p>' . esc_html__( 'Our advertisers will be featured here soon.', 'gat-core' ) . '</p>';
 		}
-		$html = '<ul class="gat-ad-grid">';
+		$html = '<ul class="gat-partner-grid">';
 		foreach ( $ads as $ad ) {
 			$inner = $ad['logo'] ? '<img src="' . esc_url( $ad['logo'] ) . '" alt="" loading="lazy">' : '';
 			$inner .= '<span class="screen-reader-text">' . esc_html( $ad['name'] ) . '</span>';
 			$html .= '<li>' . ( $ad['url']
-				? '<a href="' . esc_url( $ad['url'] ) . '" target="_blank" rel="noopener sponsored">' . $inner . '</a>'
+				? '<a href="' . esc_url( $ad['url'] ) . '" target="_blank" rel="noopener">' . $inner . '</a>'
 				: '<span>' . $inner . '</span>' ) . '</li>';
 		}
 		return $html . '</ul>';

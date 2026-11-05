@@ -73,33 +73,34 @@ $gat_hero_sm = $gat_hero_id ? gat_home_image( 'hero_image', 'hero-900.jpg', 'med
 </section>
 <?php endif; ?>
 
+<?php $gat_ads = gat_advertisers(); ?>
 <section class="section section--about">
-	<div class="wrap about-grid<?php echo gat_advertisers() ? '' : ' no-ads'; ?>">
-		<div class="about-card" style="--about-img:url('<?php echo esc_url( gat_home_image( 'about_image', 'about.jpg' ) ); ?>')">
+	<div class="wrap about-grid<?php echo $gat_ads ? '' : ' no-partners'; ?>">
+		<div class="about-card" style="--about-img:url('<?php echo esc_url( gat_home_image( 'about_image', 'about.jpg', 'full' ) ); ?>')">
 			<div class="about-card__content">
 				<p class="eyebrow"><?php echo esc_html( gat_home( 'about_eyebrow' ) ); ?></p>
 				<h2 class="display"><?php echo esc_html( gat_home( 'about_title' ) ); ?></h2>
 				<p><?php echo esc_html( gat_home( 'about_text' ) ); ?></p>
 				<?php if ( gat_home( 'about_btn_label' ) ) : ?>
-					<a class="btn btn--navy" href="<?php echo esc_url( gat_url( gat_home( 'about_btn_url' ) ) ); ?>"><span><?php echo esc_html( gat_home( 'about_btn_label' ) ); ?></span><?php echo gat_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
+					<a class="btn btn--primary" href="<?php echo esc_url( gat_url( gat_home( 'about_btn_url' ) ) ); ?>"><span><?php echo esc_html( gat_home( 'about_btn_label' ) ); ?></span><?php echo gat_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
 				<?php endif; ?>
 			</div>
 		</div>
 
-		<?php $gat_ads = gat_advertisers(); ?>
 		<?php if ( $gat_ads ) : ?>
-		<aside class="ads-card" aria-label="<?php echo esc_attr( gat_home( 'ads_title' ) ); ?>">
-			<div class="ads-card__head">
+		<?php /* Class names avoid "ad"/"ads" so ad blockers don't hide this box. */ ?>
+		<aside class="partner-card" aria-label="<?php echo esc_attr( gat_home( 'ads_title' ) ); ?>">
+			<div class="partner-card__head">
 				<h2><?php echo esc_html( gat_home( 'ads_title' ) ); ?></h2>
 				<a href="<?php echo esc_url( home_url( '/advertising/' ) ); ?>"><?php esc_html_e( 'View All', 'gat' ); ?></a>
 			</div>
-			<div class="ads-carousel" data-carousel>
-				<ul class="ads-carousel__track">
+			<div class="partner-carousel" data-carousel>
+				<ul class="partner-carousel__track">
 					<?php foreach ( $gat_ads as $gat_ad ) : ?>
-						<li class="ad-tile">
-							<?php if ( $gat_ad['url'] ) : ?><a href="<?php echo esc_url( $gat_ad['url'] ); ?>" target="_blank" rel="noopener sponsored"><?php else : ?><span><?php endif; ?>
+						<li class="partner-tile">
+							<?php if ( $gat_ad['url'] ) : ?><a href="<?php echo esc_url( $gat_ad['url'] ); ?>" target="_blank" rel="noopener"><?php else : ?><span><?php endif; ?>
 								<?php if ( $gat_ad['logo'] ) : ?>
-									<img src="<?php echo esc_url( $gat_ad['logo'] ); ?>" alt="<?php echo esc_attr( $gat_ad['name'] ); ?>" loading="lazy">
+									<img src="<?php echo esc_url( $gat_ad['logo'] ); ?>" alt="<?php echo esc_attr( $gat_ad['name'] ); ?>">
 								<?php else : ?>
 									<strong><?php echo esc_html( $gat_ad['name'] ); ?></strong>
 								<?php endif; ?>
@@ -108,10 +109,10 @@ $gat_hero_sm = $gat_hero_id ? gat_home_image( 'hero_image', 'hero-900.jpg', 'med
 					<?php endforeach; ?>
 				</ul>
 			</div>
-			<div class="ads-card__controls">
-				<button class="round-btn" type="button" data-carousel-prev aria-label="<?php esc_attr_e( 'Previous advertisers', 'gat' ); ?>"><?php echo gat_icon( 'chevron-l', 16 ); // phpcs:ignore ?></button>
+			<div class="partner-card__controls">
+				<button class="round-btn" type="button" data-carousel-prev aria-label="<?php esc_attr_e( 'Previous', 'gat' ); ?>"><?php echo gat_icon( 'chevron-l', 16 ); // phpcs:ignore ?></button>
 				<span class="dots" data-carousel-dots aria-hidden="true"></span>
-				<button class="round-btn" type="button" data-carousel-next aria-label="<?php esc_attr_e( 'Next advertisers', 'gat' ); ?>"><?php echo gat_icon( 'chevron-r', 16 ); // phpcs:ignore ?></button>
+				<button class="round-btn" type="button" data-carousel-next aria-label="<?php esc_attr_e( 'Next', 'gat' ); ?>"><?php echo gat_icon( 'chevron-r', 16 ); // phpcs:ignore ?></button>
 			</div>
 		</aside>
 		<?php endif; ?>

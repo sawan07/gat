@@ -665,7 +665,7 @@ function gat_core_add_samples() {
 	}
 	$log[] = __( 'Added 4 sample news items.', 'gat-core' );
 
-	$ads = array( array( 'Al Rahma Halal Meat', 'ad1.jpg' ), array( 'Bright Future Education Centre', 'ad2.jpg' ), array( 'Medway Pharmacy', 'ad3.jpg' ), array( 'Al Rahma Halal Meat ', 'ad1.jpg' ), array( 'Bright Future Education Centre ', 'ad2.jpg' ), array( 'Medway Pharmacy ', 'ad3.jpg' ) );
+	$ads = array( array( 'Al Rahma Halal Meat', 'partner1.jpg' ), array( 'Bright Future Education Centre', 'partner2.jpg' ), array( 'Medway Pharmacy', 'partner3.jpg' ), array( 'Al Rahma Halal Meat ', 'partner1.jpg' ), array( 'Bright Future Education Centre ', 'partner2.jpg' ), array( 'Medway Pharmacy ', 'partner3.jpg' ) );
 	foreach ( $ads as $i => list( $name, $img ) ) {
 		$id = wp_insert_post( array( 'post_type' => 'gat_advertiser', 'post_status' => 'publish', 'post_title' => trim( $name ) . ' (sample)', 'menu_order' => $i ) );
 		update_post_meta( $id, '_gat_sample', 1 );

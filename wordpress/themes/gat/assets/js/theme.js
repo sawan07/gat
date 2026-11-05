@@ -74,14 +74,14 @@
 
 	// Advertiser carousel: pages of 3 (2 on small screens), auto-advance.
 	document.querySelectorAll('[data-carousel]').forEach(function (car) {
-		var card = car.closest('.ads-card');
-		var track = car.querySelector('.ads-carousel__track');
+		var card = car.closest('.partner-card');
+		var track = car.querySelector('.partner-carousel__track');
 		var tiles = track.children;
 		var dotsEl = card.querySelector('[data-carousel-dots]');
 		var page = 0;
 		var timer;
 
-		function perPage() { return window.innerWidth < 420 ? 2 : 3; }
+		function perPage() { var w = car.clientWidth; return w > 640 ? 5 : w > 250 ? 3 : 2; }
 		function pages() { return Math.max(1, Math.ceil(tiles.length / perPage())); }
 		function render() {
 			var pp = perPage();
@@ -97,8 +97,7 @@
 					dotsEl.appendChild(d);
 				}
 			}
-			var controls = card.querySelector('.ads-card__controls');
-			if (controls) { controls.hidden = pages() < 2; }
+			card.querySelectorAll('[data-carousel-prev],[data-carousel-next],[data-carousel-dots]').forEach(function (el) { el.style.visibility = pages() < 2 ? 'hidden' : ''; });
 		}
 		function go(delta) { page = (page + delta + pages()) % pages(); render(); }
 		function auto() {

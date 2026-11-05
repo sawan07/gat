@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'GAT_THEME_VERSION', '1.0.4' );
+define( 'GAT_THEME_VERSION', '1.0.5' );
 
 require_once get_template_directory() . '/inc/helpers.php';
 require_once get_template_directory() . '/inc/customizer.php';
