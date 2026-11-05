@@ -500,18 +500,15 @@ h1, h2, h3, h4 { color: var(--navy); line-height: 1.2; }
 .legal-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 0; }
 .legal-links li + li::before { content: "|"; margin: 0 12px; opacity: .5; }
 /* "Powered by Amverio" */
-.site-footer__credit {
-	position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center;
-	padding-top: 14px; padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(255,255,255,.12);
-	font-size: 12.5px; color: #b9cbe2;
-}
-.site-footer__credit a { color: #fff; font-weight: 700; text-decoration: none; letter-spacing: .2px; }
-.site-footer__credit a:hover { text-decoration: underline; }
-.site-footer__bottom { padding-bottom: 16px !important; }
+.site-footer__credit { color: #e2ebf7; text-decoration: none; margin-left: 4px; white-space: nowrap; }
+.site-footer__credit::before { content: "·"; margin-right: 8px; opacity: .6; }
+.site-footer__credit:hover { color: #fff; text-decoration: underline; }
 @media (max-width: 860px) {
 	.site-footer__grid, .site-footer__grid.no-contact { grid-template-columns: 1fr; gap: 28px; }
 }
 @media (max-width: 600px) {
 	.legal-links { gap: 6px 18px; }
 	.legal-links li + li::before { display: none; }
+	.site-footer__credit { display: block; margin: 4px 0 0; }
+	.site-footer__credit::before { display: none; }
 }
