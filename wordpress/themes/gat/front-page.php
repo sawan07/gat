@@ -23,7 +23,12 @@ $gat_news_posts = $gat_news->posts;
 $gat_hero_badge = array_filter( array_map( 'trim', explode( "\n", (string) gat_home( 'hero_badge' ) ) ) );
 ?>
 
-<section class="hero" style="--hero-img:url('<?php echo esc_url( gat_home_image( 'hero_image', 'hero.jpg', 'full' ) ); ?>')">
+<?php
+$gat_hero_id = absint( gat_home( 'hero_image' ) );
+$gat_hero_lg = gat_home_image( 'hero_image', 'hero.jpg', 'full' );
+$gat_hero_sm = $gat_hero_id ? gat_home_image( 'hero_image', 'hero-900.jpg', 'medium_large' ) : get_theme_file_uri( 'assets/img/hero-900.jpg' );
+?>
+<section class="hero" style="--hero-img:url('<?php echo esc_url( $gat_hero_lg ); ?>');--hero-img-sm:url('<?php echo esc_url( $gat_hero_sm ); ?>')">
 	<div class="wrap hero__inner">
 		<div class="hero__content">
 			<?php if ( gat_home( 'hero_eyebrow' ) ) : ?>
