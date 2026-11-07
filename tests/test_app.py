@@ -275,3 +275,40 @@ def test_wordpress_down_does_not_break_chat(monkeypatch, stripe_calls):
     monkeypatch.setattr(wp_sync.urllib.request, "urlopen", boom)
     out = tools.create_donation(amount=20, campaign_id="GENERAL", donor_name="A", donor_email="a@example.com")
     assert out["success"] and out["payment_link"]
+
+
+def test_gat_info_topics_and_links(monkeypatch):
+    monkeypatch.setenv("GAT_SITE_URL", "https://gat-site.example/")
+    out = tools.get_gat_info("enrolment")
+    assert out["found"] and out["page_url"] == "https://gat-site.example/sunnah-academy/enrol/"
+    assert "enrolment form" in out["approved_text"]
+    assert tools.get_gat_info("donating")["page_url"] == "https://gat-site.example/donate/"
+    miss = tools.get_gat_info("weather")
+    assert miss["found"] is False and "contact-us" in miss["contact_page"] and "about" in miss["topics"]
+    assert "get_gat_info" in tools.TOOL_FUNCTIONS
+    assert any(t["function"]["name"] == "get_gat_info" for t in gat_app.OPENAI_TOOLS)
+
+
+def test_gat_info_has_no_placeholders():
+    from data import GAT_INFO
+    for entry in GAT_INFO.values():
+        assert "[" not in entry["text"] and "Insert" not in entry["text"]
+
+
+def test_prompt_restricts_scope():
+    p = gat_app.system_prompt()
+    assert "I can only help with donations to Global Alliance Trust" in p
+    assert "Never collect a child's" in p and "get_gat_info" in p
+    assert "{gift_aid_rule}" not in p
+
+
+def test_cors_allows_wordpress_site_only(client):
+    ok = client.options("/api/chat", headers={
+        "Origin": "https://gat-site.amverio.co.uk",
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type"})
+    assert ok.status_code == 200
+    assert ok.headers["access-control-allow-origin"] == "https://gat-site.amverio.co.uk"
+    bad = client.options("/api/chat", headers={
+        "Origin": "https://evil.example", "Access-Control-Request-Method": "POST"})
+    assert "access-control-allow-origin" not in bad.headers

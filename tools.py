@@ -10,7 +10,7 @@ from payments import create_payment_link
 from mailer import send_donation_email
 from wp_sync import record_donation
 from data import (
-    ORG, CAMPAIGNS, CAMPAIGNS_BY_ID, DONATIONS, GIFT_AID_RATE,
+    ORG, CAMPAIGNS, CAMPAIGNS_BY_ID, DONATIONS, GIFT_AID_RATE, GAT_INFO,
     next_donation_id,
 )
 
@@ -44,6 +44,36 @@ def get_campaigns() -> dict:
             {"id": c["id"], "name": c["name"], "description": c["description"]}
             for c in CAMPAIGNS
         ],
+    }
+
+
+def site_url() -> str:
+    return (os.environ.get("GAT_SITE_URL", "https://gat-site.amverio.co.uk").strip() or
+            "https://gat-site.amverio.co.uk").rstrip("/")
+
+
+def page_url(slug: str) -> str:
+    return f"{site_url()}/{slug.strip('/')}/"
+
+
+def get_gat_info(topic: str = "") -> dict:
+    """Approved information about GAT and the Sunnah Academy, with the page link."""
+    key = (topic or "").strip().lower()
+    entry = GAT_INFO.get(key)
+    if not entry:
+        return {
+            "found": False,
+            "reason": "Unknown topic. Use one of the listed topics.",
+            "topics": sorted(GAT_INFO),
+            "contact_page": page_url("contact-us"),
+        }
+    return {
+        "found": True,
+        "topic": key,
+        "title": entry["title"],
+        "approved_text": entry["text"],
+        "page_url": page_url(entry["page"]),
+        "note": "Answer only from approved_text. Anything not covered: suggest the Contact page.",
     }
 
 
@@ -155,6 +185,21 @@ TOOL_SCHEMAS = [
         "input_schema": {"type": "object", "properties": {}},
     },
     {
+        "name": "get_gat_info",
+        "description": (
+            "Get GAT's approved information on a topic, plus the website page link. "
+            "Use it for every general question about Global Alliance Trust or the "
+            "Sunnah Academy; never answer those from memory."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "topic": {"type": "string", "enum": sorted(GAT_INFO)},
+            },
+            "required": ["topic"],
+        },
+    },
+    {
         "name": "create_donation",
         "description": (
             "Record a donation and create its secure Stripe payment link (payment_link "
@@ -195,5 +240,6 @@ TOOL_SCHEMAS = [
 
 TOOL_FUNCTIONS = {
     "get_campaigns": lambda **kwargs: get_campaigns(),
+    "get_gat_info": lambda **kwargs: get_gat_info(kwargs.get("topic", "")),
     "create_donation": lambda **kwargs: create_donation(**kwargs),
 }

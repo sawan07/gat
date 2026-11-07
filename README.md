@@ -5,7 +5,8 @@ Live at **https://gat.amverio.co.uk** (Coolify app `gat-ai`, project Amverio →
 
 | Path | What it is |
 |---|---|
-| `/` | **GAT Donation Assistant**: AI chat that explains GAT's causes and takes donations (amount, cause, one-off/monthly, Gift Aid, dedication, anonymity), then gives the donor a Stripe payment link in the chat, inside the GAT site header and footer |
+| `/` | **GAT Assistant**: AI chat that answers general questions about GAT and the Sunnah Academy from approved content, explains GAT's causes and takes donations (amount, cause, one-off/monthly, Gift Aid, dedication, anonymity), then gives the donor a Stripe payment link in the chat, inside the GAT site header and footer |
+| `/api/new-thread`, `/api/chat` | Chat API, also used by the chat bubble on the WordPress site (see `GAT_ALLOWED_ORIGINS`) |
 | `/thank-you` | Where Stripe sends donors after paying |
 | `/concepts/` | Design previews for GAT (Online Soft) |
 | `/healthz` | Health check; also shows whether Stripe is configured |
@@ -13,6 +14,17 @@ Live at **https://gat.amverio.co.uk** (Coolify app `gat-ai`, project Amverio →
 The assistant was moved here from the `amverio` repo, where it was the
 "fundraising" demo domain (persona "Bright Horizons Trust", last present in
 amverio commit `80d22ca`). It now runs on its own, with no domain registry.
+
+## Scope
+
+The assistant only does two things: donations, and general questions about
+GAT and the Sunnah Academy. General answers come only from the approved text
+in `data.py` (`GAT_INFO`, taken from GAT's website content document) through
+the `get_gat_info` tool, with a link to the matching website page. Anything
+else gets a polite refusal. It never takes enrolment or children's details
+(it links to the enrolment form), never gives religious, legal, medical or
+financial advice, and ignores attempts to change its rules. To change what it
+can say, edit `GAT_INFO`.
 
 ## Files
 
@@ -80,6 +92,8 @@ Tests: `pip install pytest && pytest -q`
 | `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_HOST` / `SMTP_PORT` | (unset) / `smtp-relay.brevo.com` / `587` | Brevo SMTP, used if the API key isn't set or fails |
 | `GAT_WP_URL` | (unset) | WordPress site to record donations in, e.g. `https://gat-site.amverio.co.uk` |
 | `GAT_WP_SECRET` | (unset) | Shared secret from WordPress → Settings → GAT Settings |
+| `GAT_ALLOWED_ORIGINS` | `https://gat-site.amverio.co.uk` | Websites allowed to embed the chat bubble (comma-separated) |
+| `GAT_SITE_URL` | `https://gat-site.amverio.co.uk` | GAT website the assistant links to (Donate, Enrol, Contact pages) |
 | `GAT_EMAIL_FROM_NAME` | `Global Alliance Trust` | From name on emails |
 | `GAT_MODEL` | `gpt-4.1` | Model used for the assistant |
 | `GAT_GIFT_AID` | `1` | Set `0` if GAT isn't registered with HMRC for Gift Aid; the assistant then stops offering it |

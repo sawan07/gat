@@ -3,6 +3,8 @@ Global Alliance Trust: web server for the GAT donation assistant.
 
 Routes:
     /              the donation assistant chat page (static/index.html)
+                   (the same API also powers the chat bubble on the WordPress
+                   site; GAT_ALLOWED_ORIGINS lists the sites allowed to call it)
     /concepts/     the homepage design concepts preview (static/concepts/)
     /api/new-thread, /api/chat   the chat API used by the page
     /healthz       health check for Coolify
@@ -20,6 +22,7 @@ import logging
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -162,6 +165,23 @@ class ChatResponse(BaseModel):
 app = FastAPI(title="Global Alliance Trust Assistant", docs_url=None, redoc_url=None)
 
 
+def allowed_origins() -> list[str]:
+    """Websites allowed to embed the chat bubble (comma-separated env)."""
+    raw = os.environ.get("GAT_ALLOWED_ORIGINS", "https://gat-site.amverio.co.uk")
+    return [o.strip().rstrip("/") for o in raw.split(",") if o.strip()]
+
+
+# The WordPress site's chat bubble calls /api/* from another origin.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins(),
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+    allow_credentials=False,
+    max_age=600,
+)
+
+
 @app.get("/healthz")
 def healthz():
     return {"ok": True, "agent": "gat", "payments": stripe_enabled()}
@@ -213,6 +233,7 @@ def chat(req: ChatRequest, request: Request):
                 tools=OPENAI_TOOLS,
                 messages=messages,
                 max_tokens=MAX_COMPLETION_TOKENS,
+                temperature=0.3,
             )
         except Exception:
             log.exception("OpenAI call failed")

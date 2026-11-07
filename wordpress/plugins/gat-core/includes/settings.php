@@ -27,6 +27,8 @@ function gat_settings_defaults() {
 		'gift_aid_text'         => 'I want to Gift Aid my donation and any donations I make in the future or have made in the past 4 years to Global Alliance Trust. I am a UK taxpayer and understand that if I pay less Income Tax and/or Capital Gains Tax than the amount of Gift Aid claimed on all my donations in that tax year it is my responsibility to pay any difference.',
 		'donations_email'       => '',
 		'assistant_secret'      => '',
+		'chat_enabled'          => 1,
+		'chat_api'              => 'https://gat.amverio.co.uk',
 	);
 }
 
@@ -133,7 +135,7 @@ function gat_core_sanitize_settings( $in ) {
 		add_settings_error( 'gat_settings', 'whsec', __( 'The webhook signing secret should start with whsec_.', 'gat-core' ), 'warning' );
 	}
 
-	foreach ( array( 'enrol_open', 'donate_monthly', 'gift_aid' ) as $k ) {
+	foreach ( array( 'enrol_open', 'donate_monthly', 'gift_aid', 'chat_enabled' ) as $k ) {
 		$out[ $k ] = empty( $in[ $k ] ) ? 0 : 1;
 	}
 	$fee              = trim( (string) ( $in['enrol_fee'] ?? '' ) );
@@ -146,6 +148,8 @@ function gat_core_sanitize_settings( $in ) {
 	foreach ( array( 'academy_email', 'donations_email' ) as $k ) {
 		$out[ $k ] = sanitize_email( $in[ $k ] ?? '' );
 	}
+	$api             = esc_url_raw( trim( (string) ( $in['chat_api'] ?? '' ) ), array( 'https' ) );
+	$out['chat_api'] = $api ? untrailingslashit( $api ) : 'https://gat.amverio.co.uk';
 	// Set internally (first run); the form never posts this field.
 	if ( ! empty( $in['assistant_secret'] ) && empty( $old['assistant_secret'] ) ) {
 		$out['assistant_secret'] = sanitize_text_field( $in['assistant_secret'] );
@@ -254,6 +258,18 @@ function gat_core_settings_page() {
 			</table>
 
 			<h2><?php esc_html_e( 'Donation assistant (AI chat)', 'gat-core' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Chat bubble', 'gat-core' ); ?></th>
+					<td><label><input type="checkbox" name="gat_settings[chat_enabled]" value="1" <?php checked( $s['chat_enabled'] ); ?>> <?php esc_html_e( 'Show the assistant as a chat bubble on every page', 'gat-core' ); ?></label>
+					<p class="description"><?php esc_html_e( 'It only answers donation questions and general questions about GAT and the Sunnah Academy.', 'gat-core' ); ?></p></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="gat-chat-api"><?php esc_html_e( 'Assistant address', 'gat-core' ); ?></label></th>
+					<td><input type="url" class="regular-text" id="gat-chat-api" name="gat_settings[chat_api]" value="<?php echo esc_attr( $s['chat_api'] ); ?>">
+					<p class="description"><?php esc_html_e( 'Leave as it is unless Amverio tells you otherwise.', 'gat-core' ); ?></p></td>
+				</tr>
+			</table>
 			<p><?php esc_html_e( 'Lets the donation assistant record its donations here, so every donation appears under Donations. Set these two values on the assistant (in Coolify):', 'gat-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<tr><th>GAT_WP_URL</th><td><code><?php echo esc_html( untrailingslashit( home_url() ) ); ?></code></td></tr>

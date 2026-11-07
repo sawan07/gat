@@ -197,17 +197,16 @@
       </div>
     </a>
     <nav class="main-nav" id="mainNav" aria-label="Main">
-      <!-- Swap the # links for the real site pages once the main site is live. -->
-      <a href="#">Home</a>
-      <a href="#">About Us<span class="caret">▾</span></a>
-      <a href="#">Our Services<span class="caret">▾</span></a>
-      <a href="#">Sunnah Academy / Maktab<span class="caret">▾</span></a>
-      <a href="#">Advertising</a>
-      <a href="#">Management</a>
-      <a href="#">Contact</a>
+      <a href="https://gat-site.amverio.co.uk/">Home</a>
+      <a href="https://gat-site.amverio.co.uk/about-us/">About Us</a>
+      <a href="https://gat-site.amverio.co.uk/our-services/">Our Services</a>
+      <a href="https://gat-site.amverio.co.uk/sunnah-academy/">Sunnah Academy / Maktab</a>
+      <a href="https://gat-site.amverio.co.uk/advertising/">Advertising</a>
+      <a href="https://gat-site.amverio.co.uk/management/">Management</a>
+      <a href="https://gat-site.amverio.co.uk/contact-us/">Contact</a>
     </nav>
     <div class="head-actions">
-      <a class="btn-donate" href="#chat" id="headDonate">
+      <a class="btn-donate" href="https://gat-site.amverio.co.uk/donate/" id="headDonate">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.2 4.2 13.5l-1-1.1a5.5 5.5 0 0 1 7.8-7.8l1 1.1 1-1.1a5.5 5.5 0 0 1 7.8 7.8l-1 1.1z"/></svg>
         Donate
       </a>
@@ -239,7 +238,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.2 4.2 13.5l-1-1.1a5.5 5.5 0 0 1 7.8-7.8l1 1.1 1-1.1a5.5 5.5 0 0 1 7.8 7.8l-1 1.1z"/></svg>
           </div>
           <div>
-            <div class="agent-name">GAT Donation Assistant</div>
+            <div class="agent-name">GAT Assistant</div>
             <div class="agent-status">Online</div>
           </div>
         </div>
@@ -248,8 +247,8 @@
       <div class="messages" id="messages" aria-live="polite"></div>
       <div class="chips" id="chips">
         <button class="chip" type="button">What causes can I support?</button>
-        <button class="chip" type="button">I'd like to donate to the food bank</button>
         <button class="chip" type="button">Set up a monthly gift</button>
+        <button class="chip" type="button">About Sunnah Academy</button>
       </div>
       <form class="composer" id="chatForm">
         <textarea id="input" rows="1" maxlength="1000" placeholder="Type your message…" aria-label="Message"></textarea>
@@ -281,10 +280,10 @@
     <div>
       <h3>Quick Links</h3>
       <div class="quick">
-        <a href="#">Home</a><a href="#chat">Donate</a>
-        <a href="#">About Us</a><a href="#">Advertising</a>
-        <a href="#">Our Services</a><a href="#">Management</a>
-        <a href="#">Sunnah Academy / Maktab</a><a href="#">Contact</a>
+        <a href="https://gat-site.amverio.co.uk/">Home</a><a href="https://gat-site.amverio.co.uk/donate/">Donate</a>
+        <a href="https://gat-site.amverio.co.uk/about-us/">About Us</a><a href="https://gat-site.amverio.co.uk/advertising/">Advertising</a>
+        <a href="https://gat-site.amverio.co.uk/our-services/">Our Services</a><a href="https://gat-site.amverio.co.uk/management/">Management</a>
+        <a href="https://gat-site.amverio.co.uk/sunnah-academy/">Sunnah Academy / Maktab</a><a href="https://gat-site.amverio.co.uk/contact-us/">Contact</a>
       </div>
     </div>
     <div id="contactCol" hidden>
@@ -294,7 +293,7 @@
   </div>
   <div class="wrap foot-bottom">
     <span>© <span id="year"></span> Global Alliance Trust. All rights reserved.</span>
-    <nav aria-label="Legal"><a href="#">Privacy Policy</a><span>|</span><a href="#">Terms &amp; Conditions</a></nav>
+    <nav aria-label="Legal"><a href="https://gat-site.amverio.co.uk/privacy-policy/">Privacy Policy</a><span>|</span><a href="https://gat-site.amverio.co.uk/website-terms/">Terms &amp; Conditions</a></nav>
   </div>
 </footer>
 
@@ -304,7 +303,7 @@
   // so the Contact Us column stays hidden until these are filled in.
   const CONTACT = { address: "", email: "", phone: "" };
 
-  const GREETING = "Hello and welcome to Global Alliance Trust. I can tell you about the causes we support or help you make a donation. What would you like to do?";
+  const GREETING = "Hello and welcome to Global Alliance Trust. I can help you make a donation, or answer questions about GAT and the Sunnah Academy. What would you like to do?";
   const messagesEl = document.getElementById('messages');
   const formEl = document.getElementById('chatForm');
   const inputEl = document.getElementById('input');
@@ -319,9 +318,6 @@
   menuBtn.addEventListener('click', function(){
     const open = nav.classList.toggle('open');
     menuBtn.setAttribute('aria-expanded', String(open));
-  });
-  document.getElementById('headDonate').addEventListener('click', function(){
-    setTimeout(function(){ inputEl.focus(); }, 300);
   });
   (function renderContact(){
     const icons = {

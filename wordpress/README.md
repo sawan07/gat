@@ -67,10 +67,19 @@ ever stored: payments happen on Stripe's page.
    Paste its signing secret (`whsec_…`) in GAT Settings.
 3. Refunds and cancelling monthly gifts are done in Stripe; WordPress updates itself.
 
-### Donation assistant link
+### Donation assistant (chat bubble)
 
-In Coolify (`gat-ai`), set `GAT_WP_URL` (this site) and `GAT_WP_SECRET` (shown in
-GAT Settings). Assistant donations then appear under Donations, marked "Donation assistant".
+The AI assistant (Coolify app `gat-ai`, https://gat.amverio.co.uk) shows as a
+**Chat with us** bubble on every page. It only handles donations and general
+questions about GAT and the Sunnah Academy, and refuses anything else. All
+"Donate" buttons still go to the normal Donate page form. Any link to `#gat-chat`
+(or any element with `data-gat-chat-open`) opens the chat.
+
+- GAT Settings → *Donation assistant*: switch the bubble on/off; assistant address.
+- In Coolify (`gat-ai`): `GAT_ALLOWED_ORIGINS` must list this site's address
+  (e.g. `https://gat-site.amverio.co.uk`), or the bubble can't reach the assistant.
+- Set `GAT_WP_URL` (this site) and `GAT_WP_SECRET` (shown in GAT Settings) too, so
+  assistant donations appear under Donations, marked "Donation assistant".
 
 ## Who edits what
 

@@ -207,7 +207,7 @@ function gat_core_starter_pages() {
 		. gat_b_h( 'Make a Donation', 2, 'make-a-donation' )
 		. gat_b_p( 'Choose an amount below or enter the amount you wish to contribute.' )
 		. gat_b_sc( '[gat_donate_form]' )
-		. gat_b_p( 'Prefer to chat? Our <a href="https://gat.amverio.co.uk/">online donation assistant</a> can help you choose a cause and give.' )
+		. gat_b_p( 'Have a question first? <a href="#gat-chat">Chat with our online assistant</a>: it can help you choose a cause, or take your donation in the chat.' )
 		. gat_b_h( 'Why Support Us?' )
 		. gat_b_p( 'Your contribution can help support the development of community activities and services. Depending on the Trust’s approved priorities and available funding, donations may contribute towards:' )
 		. gat_b_list(
@@ -737,13 +737,26 @@ function gat_core_upgrade_content() {
 			);
 		}
 	}
-	update_option( 'gat_core_content_version', '1.1' );
+	// 1.2: the assistant is now the chat bubble, so the Donate page opens it
+	// instead of linking away to the standalone assistant page.
+	$donate = get_page_by_path( 'donate' );
+	if ( $donate ) {
+		$fixed = preg_replace(
+			'#<p>Prefer to chat\? Our <a href="https://gat\.amverio\.co\.uk/">online donation assistant</a> can help you choose a cause and give\.</p>#',
+			'<p>Have a question first? <a href="#gat-chat">Chat with our online assistant</a>: it can help you choose a cause, or take your donation in the chat.</p>',
+			$donate->post_content
+		);
+		if ( $fixed && $fixed !== $donate->post_content ) {
+			wp_update_post( array( 'ID' => $donate->ID, 'post_content' => $fixed ) );
+		}
+	}
+	update_option( 'gat_core_content_version', '1.2' );
 }
 
 add_action(
 	'admin_init',
 	function () {
-		if ( version_compare( (string) get_option( 'gat_core_content_version', '1.0' ), '1.1', '<' ) && get_page_by_path( 'donate' ) ) {
+		if ( version_compare( (string) get_option( 'gat_core_content_version', '1.0' ), '1.2', '<' ) && get_page_by_path( 'donate' ) ) {
 			gat_core_upgrade_content();
 		}
 	}
