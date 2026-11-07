@@ -139,6 +139,9 @@ function gat_core_dashboard_widget() {
 	if ( current_user_can( 'gat_view_donations' ) ) {
 		$links[] = array( admin_url( 'admin.php?page=gat-donations' ), __( 'Donations', 'gat-core' ), 'dashicons-heart' );
 	}
+	if ( function_exists( 'gat_portal_sections' ) && gat_portal_sections() ) {
+		$links[] = array( gat_portal_url(), __( 'Staff portal (donations, students, enquiries)', 'gat-core' ), 'dashicons-groups' );
+	}
 	$links[] = array( admin_url( 'profile.php' ), __( 'My profile & language', 'gat-core' ), 'dashicons-admin-users' );
 
 	echo '<ul class="gat-quick">';

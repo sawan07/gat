@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: GAT Core
- * Description: Global Alliance Trust site features: online donations and Sunnah Academy enrolment (Stripe), Students and Donations admin, donation assistant chat bubble, advertisers, enquiry forms, staff roles, simplified admin panel and starter content.
- * Version: 1.2.0
+ * Description: Global Alliance Trust site features: online donations and Sunnah Academy enrolment (Stripe), Students and Donations admin, donation assistant chat bubble, staff portal (/staff/), advertisers, enquiry forms, staff roles, simplified admin panel and starter content.
+ * Version: 1.3.0
  * Author: Amverio
  * Author URI: https://amverio.co.uk
  * Requires at least: 6.5
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'GAT_CORE_VERSION', '1.2.0' );
+define( 'GAT_CORE_VERSION', '1.3.0' );
 define( 'GAT_CORE_FILE', __FILE__ );
 define( 'GAT_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GAT_CORE_URL', plugin_dir_url( __FILE__ ) );
@@ -34,6 +34,7 @@ require_once GAT_CORE_DIR . 'includes/enrolment.php';
 require_once GAT_CORE_DIR . 'includes/admin-students.php';
 require_once GAT_CORE_DIR . 'includes/admin-donations.php';
 require_once GAT_CORE_DIR . 'includes/chat.php';
+require_once GAT_CORE_DIR . 'includes/portal.php';
 
 /**
  * Allow photo uploads up to 32 MB. The standard WordPress server image keeps

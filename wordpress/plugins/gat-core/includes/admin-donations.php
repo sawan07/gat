@@ -189,9 +189,11 @@ class GAT_Donations_Table extends WP_List_Table {
 }
 
 /**
- * Summary boxes.
+ * Summary figures (shared by the admin screen and the staff portal).
+ *
+ * @return array List of array( label, value ).
  */
-function gat_donation_summary() {
+function gat_donation_summary_data() {
 	global $wpdb;
 	$t      = gat_table( 'donations' );
 	$month  = gmdate( 'Y-m-01 00:00:00' );
@@ -206,8 +208,15 @@ function gat_donation_summary() {
 	if ( gat_setting( 'gift_aid' ) ) {
 		$boxes[] = array( __( 'Gift Aid to claim this year', 'gat-core' ), gat_money( (int) round( 0.25 * $sum( "SELECT SUM(total_paid_pence) FROM $t WHERE $recv AND gift_aid = 1 AND created_at >= %s", $year ) ) ) );
 	}
+	return $boxes;
+}
+
+/**
+ * Summary boxes.
+ */
+function gat_donation_summary() {
 	echo '<div class="gat-stats">';
-	foreach ( $boxes as list( $label, $value ) ) {
+	foreach ( gat_donation_summary_data() as list( $label, $value ) ) {
 		echo '<div class="gat-stat"><span>' . esc_html( $label ) . '</span><strong>' . esc_html( $value ) . '</strong></div>';
 	}
 	echo '</div>';

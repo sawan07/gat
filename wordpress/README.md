@@ -50,6 +50,26 @@ Admin:
   enrolment fee / classes / open-closed, donation amounts / causes / monthly /
   Gift Aid, notification emails, the donation assistant's shared secret.
 
+### Staff portal (`/staff/`)
+
+A simple, GAT-branded area at **https://<site>/staff/** for staff who shouldn't
+need the WordPress admin: its own sign-in page, then Dashboard, Donations,
+Students and Enquiries (each person sees only what their role allows).
+
+- **Donations**: totals, search and filters, each donation's details, CSV and Gift
+  Aid claim downloads. View only (administrators can add notes).
+- **Students**: status tabs, search, filters, each application; Approve / Decline /
+  Pending, payment status, private staff notes, edit details, CSV download.
+- **Enquiries**: New / Done, read a message, reply by email, mark as done.
+- **My account**: change password, sign out. 2-step login and language are under
+  their WordPress profile.
+
+Academy Admins and Donations Viewers are sent to the portal after signing in and
+can't open wp-admin (except their profile). Administrators and GAT Editors get a
+"Staff portal" link in the admin bar and dashboard. Sign-in is limited to 5 wrong
+passwords per 15 minutes per visitor; users with 2-step login are sent through
+WordPress's own sign-in so the second step still applies.
+
 Data lives in its own tables (`wp_gat_students`, `wp_gat_donations`), never in
 posts, so it can't leak into search, feeds or the REST API. No card data is
 ever stored: payments happen on Stripe's page.
