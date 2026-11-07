@@ -22,6 +22,7 @@ data.py              GAT profile + causes (descriptions are placeholders)
 tools.py             get_campaigns / create_donation + their schemas
 payments.py          Stripe Payment Links for one-off and monthly donations
 mailer.py            Donation confirmation email (Brevo API or SMTP) with the payment link
+wp_sync.py           Records each donation in the WordPress Donations admin
 system_prompt.md     Assistant instructions and guardrails
 static/index.html    Donation assistant page (GAT header/footer design)
 static/thank-you.html  Post-payment page
@@ -77,6 +78,8 @@ Tests: `pip install pytest && pytest -q`
 | `BREVO_API_KEY` | (unset) | Brevo API key (`xkeysib-...`) for confirmation emails |
 | `BREVO_SENDER_EMAIL` | (unset) | From address; must be a sender/domain verified in Brevo |
 | `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_HOST` / `SMTP_PORT` | (unset) / `smtp-relay.brevo.com` / `587` | Brevo SMTP, used if the API key isn't set or fails |
+| `GAT_WP_URL` | (unset) | WordPress site to record donations in, e.g. `https://gat-site.amverio.co.uk` |
+| `GAT_WP_SECRET` | (unset) | Shared secret from WordPress → Settings → GAT Settings |
 | `GAT_EMAIL_FROM_NAME` | `Global Alliance Trust` | From name on emails |
 | `GAT_MODEL` | `gpt-4.1` | Model used for the assistant |
 | `GAT_GIFT_AID` | `1` | Set `0` if GAT isn't registered with HMRC for Gift Aid; the assistant then stops offering it |

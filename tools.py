@@ -8,6 +8,7 @@ import re
 
 from payments import create_payment_link
 from mailer import send_donation_email
+from wp_sync import record_donation
 from data import (
     ORG, CAMPAIGNS, CAMPAIGNS_BY_ID, DONATIONS, GIFT_AID_RATE,
     next_donation_id,
@@ -119,6 +120,8 @@ def create_donation(
     }
     payment_link = create_payment_link(donation)
     donation["payment_link"] = payment_link
+    # Also record it in the WordPress Donations admin (if configured).
+    record_donation(donation)
     donation["email_sent"] = send_donation_email(donation, payment_link)
     if payment_link:
         donation["payment"] = (

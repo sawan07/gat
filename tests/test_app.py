@@ -22,7 +22,7 @@ import tools
 
 @pytest.fixture(autouse=True)
 def no_stripe(monkeypatch):
-    for k in ("STRIPE_SECRET_KEY", "BREVO_API_KEY", "BREVO_SENDER_EMAIL", "SMTP_USER", "SMTP_PASSWORD"):
+    for k in ("STRIPE_SECRET_KEY", "BREVO_API_KEY", "BREVO_SENDER_EMAIL", "SMTP_USER", "SMTP_PASSWORD", "GAT_WP_URL", "GAT_WP_SECRET"):
         monkeypatch.delenv(k, raising=False)
     mailer._sent.clear()
 
@@ -69,7 +69,7 @@ def stripe_calls(monkeypatch):
         calls.append((path, dict(fields)))
         if path == "prices":
             return {"id": "price_123"}
-        return {"url": "https://buy.stripe.com/test_abc"}
+        return {"id": "plink_123", "url": "https://buy.stripe.com/test_abc"}
 
     monkeypatch.setattr(payments, "_post", fake_post)
     return calls
@@ -240,3 +240,38 @@ def test_rate_limit(client, monkeypatch):
     tid = client.post("/api/new-thread").json()["thread_id"]
     codes = [client.post("/api/chat", json={"thread_id": tid, "message": "hi"}).status_code for _ in range(3)]
     assert codes == [200, 200, 429]
+
+
+def test_donation_recorded_in_wordpress(monkeypatch, stripe_calls):
+    import wp_sync
+    monkeypatch.setenv("GAT_WP_URL", "https://gat-site.example/")
+    monkeypatch.setenv("GAT_WP_SECRET", "s3cret")
+    sent = []
+
+    class Resp:
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def read(self): return b'{"ok": true, "ref": "DN00001"}'
+
+    def fake_urlopen(req, timeout=None):
+        sent.append((req.full_url, dict(req.header_items()), json.loads(req.data)))
+        return Resp()
+
+    monkeypatch.setattr(wp_sync.urllib.request, "urlopen", fake_urlopen)
+    out = tools.create_donation(amount=20, campaign_id="ELDERLY", donor_name="A", donor_email="a@example.com")
+    assert out["success"]
+    url, headers, body = sent[0]
+    assert url == "https://gat-site.example/wp-json/gat/v1/assistant-donation"
+    assert headers["X-gat-secret"] == "s3cret"
+    assert body["payment_link_id"] == "plink_123" and body["amount"] == 20.0
+
+
+def test_wordpress_down_does_not_break_chat(monkeypatch, stripe_calls):
+    import wp_sync
+    monkeypatch.setenv("GAT_WP_URL", "https://gat-site.example")
+    monkeypatch.setenv("GAT_WP_SECRET", "s3cret")
+    def boom(req, timeout=None):
+        raise OSError("down")
+    monkeypatch.setattr(wp_sync.urllib.request, "urlopen", boom)
+    out = tools.create_donation(amount=20, campaign_id="GENERAL", donor_name="A", donor_email="a@example.com")
+    assert out["success"] and out["payment_link"]

@@ -92,49 +92,6 @@ add_action(
 );
 
 /* ---------------------------------------------------------------------------
- * Students and Donations (placeholders until enrolment and donations go live).
- * ------------------------------------------------------------------------- */
-add_action(
-	'admin_menu',
-	function () {
-		add_menu_page(
-			__( 'Students', 'gat-core' ),
-			__( 'Students', 'gat-core' ),
-			'gat_manage_students',
-			'gat-students',
-			'gat_core_students_page',
-			'dashicons-welcome-learn-more',
-			25
-		);
-		add_menu_page(
-			__( 'Donations', 'gat-core' ),
-			__( 'Donations', 'gat-core' ),
-			'gat_view_donations',
-			'gat-donations',
-			'gat_core_donations_page',
-			'dashicons-heart',
-			26
-		);
-	}
-);
-
-/**
- * Students page (placeholder).
- */
-function gat_core_students_page() {
-	echo '<div class="wrap"><h1>' . esc_html__( 'Sunnah Academy students', 'gat-core' ) . '</h1>';
-	echo '<div class="notice notice-info inline"><p>' . esc_html__( 'Online enrolment is being set up. Once it is live, every application appears here with the student, parent/guardian, payment status (Paid / Pending / Refunded) and application status (Pending / Approved / Declined). You will be able to search, review and update records.', 'gat-core' ) . '</p></div></div>';
-}
-
-/**
- * Donations page (placeholder).
- */
-function gat_core_donations_page() {
-	echo '<div class="wrap"><h1>' . esc_html__( 'Donations', 'gat-core' ) . '</h1>';
-	echo '<div class="notice notice-info inline"><p>' . esc_html__( 'Online donations are being connected. Once live, every donation (from the Donate page and the donation assistant) appears here with amount, cause, one-off or monthly, and payment status, and can be exported to a spreadsheet.', 'gat-core' ) . '</p></div></div>';
-}
-
-/* ---------------------------------------------------------------------------
  * Dashboard: one clear "what can I do here" box per role.
  * ------------------------------------------------------------------------- */
 add_action(

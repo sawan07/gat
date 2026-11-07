@@ -204,13 +204,10 @@ function gat_core_starter_pages() {
 		'Together, We Can Make a Difference',
 		gat_b_p( 'Your support can help Global Alliance Trust develop its community services, educational activities and charitable initiatives.' )
 		. gat_b_p( 'Donations provide an opportunity for individuals and organisations to contribute towards work that aims to benefit the community.' )
-		. gat_b_group(
-			gat_b_h( 'Make a Donation' )
-			. gat_b_p( 'Choose an amount or enter the amount you wish to contribute: £10, £25, £50, £100 or any other amount, as a one-off or monthly gift.' )
-			. gat_b_p( 'Our online donation assistant will guide you through choosing a cause and send you a secure Stripe payment link.' )
-			. gat_b_buttons( array( array( 'Donate Now', 'https://gat.amverio.co.uk/' ) ) ),
-			'gat-highlight'
-		)
+		. gat_b_h( 'Make a Donation', 2, 'make-a-donation' )
+		. gat_b_p( 'Choose an amount below or enter the amount you wish to contribute.' )
+		. gat_b_sc( '[gat_donate_form]' )
+		. gat_b_p( 'Prefer to chat? Our <a href="https://gat.amverio.co.uk/">online donation assistant</a> can help you choose a cause and give.' )
 		. gat_b_h( 'Why Support Us?' )
 		. gat_b_p( 'Your contribution can help support the development of community activities and services. Depending on the Trust’s approved priorities and available funding, donations may contribute towards:' )
 		. gat_b_list(
@@ -294,23 +291,26 @@ function gat_core_starter_pages() {
 	$pages['enrol'] = array(
 		'Student Enrolment',
 		'Online Student Registration',
-		gat_b_p( 'Online enrolment for Sunnah Academy / Maktab is opening soon. In the meantime, please <a href="/contact-us/">contact us</a> and we will help you register your child.', 'gat-note' )
-		. gat_b_p( 'When the online form opens, you will be asked for the following:' )
-		. gat_b_columns(
-			array(
-				gat_b_h( 'A. Student details', 3 ) . gat_b_list( array( 'Student full name', 'Date of birth', 'Address and postcode', 'Other information required by the Academy' ) ),
-				gat_b_h( 'B. Parent / guardian details', 3 ) . gat_b_list( array( 'Full name', 'Relationship to student', 'Telephone number', 'Email address', 'Emergency contact, if required' ) ),
-			)
-		)
-		. gat_b_columns(
-			array(
-				gat_b_h( 'C. Enrolment details', 3 ) . gat_b_list( array( 'Programme or class', 'Preferred start date, if applicable', 'Additional information relevant to the application' ) ),
-				gat_b_h( 'D. Declarations', 3 ) . gat_b_list( array( 'The information provided is accurate to the best of your knowledge', 'You have read the enrolment terms and privacy information', 'The application will be reviewed in line with the Academy’s enrolment arrangements' ) ),
-			)
-		)
-		. gat_b_p( 'After submitting the form you will continue to secure online payment of the enrolment fee, and receive confirmation using the contact details provided. The Academy will contact you if further information is required.' )
-		. gat_b_buttons( array( array( 'Contact Us', '/contact-us/' ), array( 'Back to Sunnah Academy', '/sunnah-academy/', true ) ) ),
+		gat_b_sc( '[gat_enrolment_form]' ),
 		'sunnah-academy',
+	);
+
+	$pages['enrol-thanks'] = array(
+		'Application Submitted',
+		'Thank You for Your Application',
+		gat_b_sc( '[gat_enrolment_result]' )
+		. gat_b_buttons( array( array( 'Back to Sunnah Academy', '/sunnah-academy/' ), array( 'Contact Us', '/contact-us/', true ) ) ),
+		'enrol',
+		'thank-you',
+	);
+
+	$pages['donate-thanks'] = array(
+		'Thank You',
+		'Your Support Makes a Difference',
+		gat_b_sc( '[gat_donation_result]' )
+		. gat_b_buttons( array( array( 'Back to the homepage', '/' ), array( 'Our Services', '/our-services/', true ) ) ),
+		'donate',
+		'thank-you',
 	);
 
 	$pages['advertising'] = array(
@@ -426,8 +426,12 @@ function gat_core_run_setup( $samples ) {
 	$log = array();
 	$ids = array();
 
-	foreach ( gat_core_starter_pages() as $slug => list( $title, $excerpt, $content, $parent ) ) {
-		$existing = get_page_by_path( $parent ? $parent . '/' . $slug : $slug );
+	$paths = array();
+	foreach ( gat_core_starter_pages() as $slug => $page ) {
+		list( $title, $excerpt, $content, $parent ) = $page;
+		$real           = $page[4] ?? $slug;
+		$paths[ $slug ] = $parent ? ( $paths[ $parent ] ?? $parent ) . '/' . $real : $real;
+		$existing       = get_page_by_path( $paths[ $slug ] );
 		if ( ! $existing && 'privacy-policy' === $slug && (int) get_option( 'wp_page_for_privacy_policy' ) ) {
 			$existing = get_post( (int) get_option( 'wp_page_for_privacy_policy' ) );
 		}
@@ -445,7 +449,7 @@ function gat_core_run_setup( $samples ) {
 				'post_type'    => 'page',
 				'post_status'  => 'publish',
 				'post_title'   => $title,
-				'post_name'    => $slug,
+				'post_name'    => $real,
 				'post_excerpt' => $excerpt,
 				'post_content' => $content,
 				'post_parent'  => $parent && isset( $ids[ $parent ] ) ? $ids[ $parent ] : 0,
@@ -699,6 +703,62 @@ function gat_core_remove_samples() {
 	/* translators: %d count */
 	return array( sprintf( __( 'Removed %d sample items.', 'gat-core' ), count( $items ) ) );
 }
+
+/**
+ * Bring an existing site's pages up to date after a plugin update:
+ * creates new pages (thank-you pages) and swaps in the real Donate and
+ * Enrolment forms where the earlier placeholder content is still in place.
+ * Pages GAT has written themselves are never overwritten.
+ */
+function gat_core_upgrade_content() {
+	$pages = gat_core_starter_pages();
+	$donate = get_page_by_path( 'donate' );
+	if ( $donate && ! str_contains( $donate->post_content, '[gat_donate_form' ) && str_contains( $donate->post_content, 'https://gat.amverio.co.uk/' ) ) {
+		wp_update_post( array( 'ID' => $donate->ID, 'post_content' => $pages['donate'][2] ) );
+	}
+	$enrol = get_page_by_path( 'sunnah-academy/enrol' );
+	if ( $enrol && ! str_contains( $enrol->post_content, '[gat_enrolment_form' ) && str_contains( $enrol->post_content, 'opening soon' ) ) {
+		wp_update_post( array( 'ID' => $enrol->ID, 'post_content' => $pages['enrol'][2] ) );
+	}
+	foreach ( array( 'donate-thanks' => 'donate', 'enrol-thanks' => 'enrol' ) as $key => $parent_key ) {
+		$parent_path = 'donate' === $parent_key ? 'donate' : 'sunnah-academy/enrol';
+		$parent      = get_page_by_path( $parent_path );
+		if ( $parent && ! get_page_by_path( $parent_path . '/thank-you' ) ) {
+			wp_insert_post(
+				array(
+					'post_type'    => 'page',
+					'post_status'  => 'publish',
+					'post_title'   => $pages[ $key ][0],
+					'post_name'    => 'thank-you',
+					'post_excerpt' => $pages[ $key ][1],
+					'post_content' => $pages[ $key ][2],
+					'post_parent'  => $parent->ID,
+				)
+			);
+		}
+	}
+	update_option( 'gat_core_content_version', '1.1' );
+}
+
+add_action(
+	'admin_init',
+	function () {
+		if ( version_compare( (string) get_option( 'gat_core_content_version', '1.0' ), '1.1', '<' ) && get_page_by_path( 'donate' ) ) {
+			gat_core_upgrade_content();
+		}
+	}
+);
+
+// Keep the thank-you pages out of menus/search engines: they only make sense after paying.
+add_filter(
+	'wp_robots',
+	function ( $robots ) {
+		if ( is_page( 'thank-you' ) ) {
+			$robots['noindex'] = true;
+		}
+		return $robots;
+	}
+);
 
 // Pages get an Excerpt box (used as the subtitle under the page title).
 add_action( 'init', fn() => add_post_type_support( 'page', 'excerpt' ) );

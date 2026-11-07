@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: GAT Core
- * Description: Global Alliance Trust site features: advertisers, enquiry forms, staff roles and a simplified admin panel, and starter content. Student enrolment and donations are added here next.
- * Version: 1.0.1
+ * Description: Global Alliance Trust site features: online donations and Sunnah Academy enrolment (Stripe), Students and Donations admin, advertisers, enquiry forms, staff roles, simplified admin panel and starter content.
+ * Version: 1.1.0
  * Author: Amverio
  * Author URI: https://amverio.co.uk
  * Requires at least: 6.5
@@ -14,17 +14,25 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'GAT_CORE_VERSION', '1.0.1' );
+define( 'GAT_CORE_VERSION', '1.1.0' );
 define( 'GAT_CORE_FILE', __FILE__ );
 define( 'GAT_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GAT_CORE_URL', plugin_dir_url( __FILE__ ) );
 
+require_once GAT_CORE_DIR . 'includes/db.php';
+require_once GAT_CORE_DIR . 'includes/settings.php';
 require_once GAT_CORE_DIR . 'includes/roles.php';
 require_once GAT_CORE_DIR . 'includes/admin.php';
 require_once GAT_CORE_DIR . 'includes/advertisers.php';
 require_once GAT_CORE_DIR . 'includes/enquiries.php';
 require_once GAT_CORE_DIR . 'includes/contact.php';
 require_once GAT_CORE_DIR . 'includes/setup.php';
+require_once GAT_CORE_DIR . 'includes/forms.php';
+require_once GAT_CORE_DIR . 'includes/stripe.php';
+require_once GAT_CORE_DIR . 'includes/donations.php';
+require_once GAT_CORE_DIR . 'includes/enrolment.php';
+require_once GAT_CORE_DIR . 'includes/admin-students.php';
+require_once GAT_CORE_DIR . 'includes/admin-donations.php';
 
 /**
  * Allow photo uploads up to 32 MB. The standard WordPress server image keeps
@@ -56,6 +64,7 @@ register_activation_hook(
 	__FILE__,
 	function () {
 		gat_core_upload_limits();
+		gat_core_install_tables();
 		gat_core_install_roles();
 		gat_core_register_advertisers();
 		gat_core_register_enquiries();

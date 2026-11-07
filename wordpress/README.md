@@ -5,8 +5,9 @@ The Global Alliance Trust website runs on WordPress on the Hetzner server
 
 ```
 themes/gat/          Custom theme built from the approved design
-plugins/gat-core/    Site features: advertisers, enquiry forms, staff roles,
-                     simplified admin, starter content (Tools → GAT Setup)
+plugins/gat-core/    Site features: online donations + Sunnah Academy enrolment
+                     (Stripe), Students and Donations admin, advertisers, enquiry
+                     forms, staff roles, simplified admin, starter content
 dist/                Ready-to-upload zips (not committed; rebuild with the commands below)
 ```
 
@@ -27,6 +28,49 @@ Rebuild the zips after changing code:
 cd wordpress/themes && zip -qr ../dist/gat-theme.zip gat
 cd ../plugins && zip -qr ../dist/gat-core.zip gat-core
 ```
+
+## Donations and enrolment (Stripe)
+
+| Page | Shortcode | What it does |
+|---|---|---|
+| Donate | `[gat_donate_form]` | £10/£25/£50/£100/other, one-off or monthly, cause, optional dedication, Gift Aid (only when switched on) → Stripe Checkout |
+| Donate → Thank You | `[gat_donation_result]` | Confirms with Stripe and thanks the donor |
+| Sunnah Academy → Student Enrolment | `[gat_enrolment_form]` | Sections A–D from GAT's content document → "Continue to Payment" (Stripe) when a fee is set |
+| … → Enrolment → Thank You | `[gat_enrolment_result]` | "Thank You for Your Application" |
+
+Admin:
+- **Students**: list with Student ID, name, parent/guardian, contact number, class,
+  enrolment date, payment status (Paid/Pending/Refunded) and application status
+  (Pending/Approved/Declined); search, filters, bulk approve/decline, view/edit,
+  private staff notes, CSV download. Administrators + Academy Admins only.
+- **Donations**: totals (this month, this year, active monthly donors, Gift Aid
+  to claim), filters, CSV download, Gift Aid claim CSV (HMRC schedule columns).
+  Administrators + Donations Viewers (view only).
+- **Settings → GAT Settings** (administrators): Stripe keys, webhook secret,
+  enrolment fee / classes / open-closed, donation amounts / causes / monthly /
+  Gift Aid, notification emails, the donation assistant's shared secret.
+
+Data lives in its own tables (`wp_gat_students`, `wp_gat_donations`), never in
+posts, so it can't leak into search, feeds or the REST API. No card data is
+ever stored: payments happen on Stripe's page.
+
+### Stripe set-up (once, in GAT's Stripe account)
+
+1. **Key**: Developers → API keys → create a restricted key with
+   *Checkout Sessions: Write*, plus *Payment Links, Prices, Products: Write* (used by the donation
+   assistant). Paste it in Settings → GAT Settings. Same key on the assistant.
+2. **Webhook**: Developers → Webhooks → Add endpoint →
+   `https://<site>/wp-json/gat/v1/stripe-webhook`, events
+   `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+   `checkout.session.async_payment_failed`, `checkout.session.expired`,
+   `charge.refunded`, `invoice.paid`, `customer.subscription.deleted`.
+   Paste its signing secret (`whsec_…`) in GAT Settings.
+3. Refunds and cancelling monthly gifts are done in Stripe; WordPress updates itself.
+
+### Donation assistant link
+
+In Coolify (`gat-ai`), set `GAT_WP_URL` (this site) and `GAT_WP_SECRET` (shown in
+GAT Settings). Assistant donations then appear under Donations, marked "Donation assistant".
 
 ## Who edits what
 
@@ -65,6 +109,6 @@ Every user can switch their own admin language (e.g. Bengali) under Profile → 
 
 ## Next
 
-- Sunnah Academy online enrolment + Stripe fee payment + Students admin (needs fee, classes, terms)
-- Donations admin (Stripe webhook records donations from the Donate page and the chat assistant)
+- Enter the confirmed enrolment fee and class list (Settings → GAT Settings)
+- Legal pages (privacy, enrolment terms, donation terms) approved by GAT
 - Real domain, HTTPS, backups, launch checklist

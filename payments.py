@@ -100,6 +100,8 @@ def create_payment_link(donation: dict) -> str | None:
 
         link = _post("payment_links", link_fields)
         url = link.get("url")
+        # The id lets WordPress match Stripe's payment back to this donation.
+        donation["payment_link_id"] = link.get("id", "")
         if url:
             log.info("Stripe payment link created for donation %s (%s)", donation_id, donation["frequency"])
             return url

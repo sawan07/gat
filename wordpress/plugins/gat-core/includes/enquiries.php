@@ -81,12 +81,13 @@ function gat_core_register_enquiries() {
 			'menu_icon'    => 'dashicons-email',
 			'supports'     => array( 'title' ),
 			'map_meta_cap' => true,
+			// Primitive capabilities only: WordPress maps edit_post/read_post/
+			// delete_post onto these itself (map_meta_cap).
 			'capabilities' => array(
 				'create_posts'           => 'do_not_allow',
-				'edit_post'              => 'gat_manage_enquiries',
-				'read_post'              => 'gat_manage_enquiries',
-				'delete_post'            => 'gat_manage_enquiries',
 				'edit_posts'             => 'gat_manage_enquiries',
+				'edit_private_posts'     => 'gat_manage_enquiries',
+				'delete_private_posts'   => 'gat_manage_enquiries',
 				'edit_others_posts'      => 'gat_manage_enquiries',
 				'delete_posts'           => 'gat_manage_enquiries',
 				'delete_others_posts'    => 'gat_manage_enquiries',
